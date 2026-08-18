@@ -1,0 +1,40 @@
+site_name: All About the Homelab | Infrastructure Documentation
+site_description: Internal homelab documentation
+site_url: https://ahnaj.github.io/homelab-docs/
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/weather-sunny
+        name: Light mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-night
+        name: Dark mode
+
+nav:
+  - Overview: index.md
+  - Hardware: hardware.md
+  - 3D Models: 3d-models.md
+
+markdown_extensions:
+  - attr_list
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+
+plugins:
+  - search
