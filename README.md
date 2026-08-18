@@ -55,12 +55,6 @@ The generated website will be placed in:
 ```text
 site/
 ```
-
-## GitHub Pages later
-
-When this repository is pushed to GitHub, the site can later be deployed with GitHub Actions or:
-
-```bash
 mkdocs gh-deploy
 ```
 
