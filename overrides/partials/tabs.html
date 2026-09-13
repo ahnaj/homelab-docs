@@ -1,0 +1,28 @@
+{% import "partials/tabs-item.html" as item with context %}
+<nav class="md-tabs" aria-label="{{ lang.t('tabs') }}" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      {% for nav_item in nav.items %}
+        {{ item.render(nav_item) }}
+      {% endfor %}
+    </ul>
+  </div>
+</nav>
+<section class="cli-nav" aria-label="Website navigation terminal" hidden>
+  <div class="md-grid cli-terminal">
+    <div class="cli-titlebar"><span>guest@homelab — navigation shell</span><span>↑↓ history · Tab complete</span></div>
+    <div class="cli-transcript" data-cli-output role="log" aria-label="Terminal output" aria-live="polite" aria-relevant="additions" tabindex="0"></div>
+    <form class="cli-nav__form" data-cli-nav>
+      <label class="cli-nav__label" for="cli-command">Terminal command</label>
+      <span class="cli-nav__prompt" data-cli-prompt aria-hidden="true">guest@homelab:/$</span>
+      <input id="cli-command" class="cli-nav__input" name="command" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-describedby="cli-hint">
+      <button class="cli-run" type="submit">Run</button>
+    </form>
+    <div id="cli-hint" class="cli-hint">Type help for commands. This shell navigates the website.</div>
+  </div>
+  <div hidden>
+    {% for nav_item in nav.items %}
+      <a data-cli-command="{{ nav_item.title | lower | replace(' ', '-') }}" href="{{ nav_item.url | url }}">{{ nav_item.title }}</a>
+    {% endfor %}
+  </div>
+</section>

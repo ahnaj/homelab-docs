@@ -1,0 +1,35 @@
+const fs = require('node:fs');
+const vm = require('node:vm');
+const assert = require('node:assert/strict');
+const source = fs.readFileSync('docs/javascripts/cli-nav.js', 'utf8');
+const saved = new Map();
+function boot(path = '') {
+  const handlers = {}, keys = {};
+  const input = {value:'', selectionStart:0, selectionEnd:0, addEventListener:(e,f)=>keys[e]=f, setSelectionRange(a,b){this.selectionStart=a;this.selectionEnd=b;}};
+  const output = {children:[], append(x){this.children.push(x)}, replaceChildren(){this.children=[]}, get childElementCount(){return this.children.length}, get firstElementChild(){return {remove:()=>this.children.shift()}}};
+  const prompt = {};
+  const pages = ['overview','hardware','3d-models','print-server'].map((name,i)=>({dataset:{cliCommand:name},href:'https://example.test/homelab-docs/'+(i?name+'/':'')}));
+  const terminal = {querySelector:s=>s.includes('output')?output:prompt,querySelectorAll:()=>pages};
+  const form = {closest:()=>terminal,querySelector:()=>input,addEventListener:(e,f)=>handlers[e]=f};
+  const location = {href:'https://example.test/homelab-docs/'+path,assign(url){this.destination=url}};
+  vm.runInNewContext(source,{document:{querySelectorAll:()=>[form],createElement:()=>({})},location,URL,sessionStorage:{getItem:k=>saved.get(k),setItem:(k,v)=>saved.set(k,v)}});
+  const run = text => {input.value=text; handlers.submit({preventDefault(){}});return output.children.at(-1)?.textContent};
+  const key = (value,extras={})=>keys.keydown({key:value,preventDefault(){},...extras});
+  return {run,key,input,output,location,prompt};
+}
+let shell=boot();
+assert.equal(shell.run('pwd'),'/');
+assert.match(shell.run('ls'),/hardware\//);
+assert.match(shell.run('hardware'),/command not found/);
+assert.match(shell.run('cd missing'),/No such directory/);
+assert.match(shell.run('pwd extra'),/unexpected arguments/);
+shell.input.value='cd /ha';shell.input.selectionStart=shell.input.selectionEnd=6;shell.key('Tab');assert.equal(shell.input.value,'cd /hardware/');
+shell.run('cd /hardware');assert.equal(shell.location.destination,'https://example.test/homelab-docs/hardware/');
+shell=boot('hardware/');assert.equal(shell.prompt.textContent,'guest@homelab:/hardware$');assert.equal(shell.run('pwd'),'/hardware');
+assert.match(shell.run('ls /'),/3d-models/);
+shell.input.value='draft';shell.key('ArrowUp');assert.equal(shell.input.value,'ls /');shell.key('ArrowDown');assert.equal(shell.input.value,'draft');
+shell.run('cd -');assert.equal(shell.location.destination,'https://example.test/homelab-docs/');
+shell.run('cd ../3d-models');assert.equal(shell.location.destination,'https://example.test/homelab-docs/3d-models/');
+shell.run('clear');assert.equal(shell.output.childElementCount,0);
+shell.input.value='unfinished';shell.key('c',{ctrlKey:true});assert.equal(shell.input.value,'');assert.match(shell.output.children.at(-1).textContent,/\^C$/);
+console.log('Passed: command output, errors, completion, navigation, restored history, draft recall, clear and cancel.');

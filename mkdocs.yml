@@ -4,28 +4,32 @@ site_url: https://ahnaj.github.io/homelab-docs/
 
 theme:
   name: material
+  custom_dir: overrides
+  font:
+    text: Ubuntu Mono
+    code: Ubuntu Mono
   features:
+    - navigation.tabs
     - navigation.sections
     - navigation.expand
     - navigation.top
     - search.highlight
     - content.code.copy
   palette:
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      toggle:
-        icon: material/weather-sunny
-        name: Light mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      toggle:
-        icon: material/weather-night
-        name: Dark mode
+    - scheme: slate
+
+extra_css:
+  - stylesheets/console.css
+
+extra_javascript:
+  - javascripts/carousel.js
+  - javascripts/cli-nav.js
 
 nav:
   - Overview: index.md
   - Hardware: hardware.md
   - 3D Models: 3d-models.md
+  - Print Server: print-server.md
 
 markdown_extensions:
   - attr_list
